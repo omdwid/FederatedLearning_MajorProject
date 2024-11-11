@@ -27,6 +27,31 @@ def getData(dist, x, y):
     return np.array(dx), np.array(dy)
 
 
+def generatePlot(x_train, y_train):
+    plt.figure(figsize=(10, 6))
+    ax = sns.countplot(y=y_train)
+    ax.set(
+        title="Frequency of Classes in MNIST Dataset",
+        xlabel="Digit Class",
+        ylabel="Frequency",
+    )
+    plt.show()
+
+
+def importData():
+    # Load Client 1's data
+    data = np.load("client1_data.npz")
+    x_train_client1 = data["x_train"]
+    y_train_client1 = data["y_train"]
+    x_test_client1 = data["x_test"]
+    y_test_client1 = data["y_test"]
+
+    print("Client 1 train data shape:", x_train_client1.shape, y_train_client1.shape)
+    print("Client 1 test data shape:", x_test_client1.shape, y_test_client1.shape)
+
+    return (x_train_client1, y_train_client1), (x_test_client1, y_test_client1)
+
+
 # Load and compile Keras model
 model = keras.Sequential(
     [
@@ -36,14 +61,18 @@ model = keras.Sequential(
         keras.layers.Dense(10, activation="softmax"),
     ]
 )
+
 model.compile("adam", "sparse_categorical_crossentropy", metrics=["accuracy"])
 
 # Load dataset
+# (x_train, y_train), (x_test, y_test) = importData()
+
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
 x_train, x_test = x_train[..., np.newaxis] / 255.0, x_test[..., np.newaxis] / 255.0
-dist = [4000, 4000, 4000, 3000, 10, 10, 10, 10, 4000, 10]
-x_train, y_train = getData(dist, x_train, y_train)
-getDist(y_train)
+# dist = [4000, 4000, 4000, 3000, 10, 10, 10, 10, 4000, 10]
+# x_train, y_train = getData(dist, x_train, y_train)
+# getDist(y_train)
+generatePlot(x_train, y_train)
 
 
 # Define Flower client
